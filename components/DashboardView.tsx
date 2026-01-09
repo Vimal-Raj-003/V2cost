@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { EstimationState } from '../types';
 import { REGIONS } from '../constants';
 
@@ -11,145 +11,140 @@ interface Props {
 }
 
 const DashboardView: React.FC<Props> = ({ state, onUpdate, onNext, onCancel }) => {
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      console.log("File dropped:", e.dataTransfer.files[0].name);
+      onNext();
+    }
+  };
+
   return (
-    <div className="animate-fadeIn">
-      <div className="mb-8">
+    <div className="animate-fadeIn pb-20">
+      <div className="mb-10 text-center lg:text-left">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Project Parameters</h1>
+            <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2">Project Initialization</h1>
+            <p className="text-slate-500 dark:text-slate-400 max-w-2xl">
+              Initialize your costing project by defining administrative details and selecting your preferred input method.
+            </p>
           </div>
-          <div className="bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-full text-xs font-semibold text-primary dark:text-blue-300">
-            25% Complete
+          <div className="bg-primary/10 px-4 py-2 rounded-xl border border-primary/20 shadow-sm">
+            <span className="text-xs font-black text-primary uppercase tracking-widest">Phase 1: Setup</span>
           </div>
         </div>
-        <div className="mt-4 w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-          <div className="h-full bg-primary w-1/4 rounded-full"></div>
+        <div className="mt-6 w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden transition-colors">
+          <div className="h-full bg-primary w-1/4 rounded-full shadow-[0_0_10px_rgba(19,91,236,0.4)]"></div>
         </div>
-        <p className="mt-6 text-subtext-light dark:text-subtext-dark max-w-3xl">
-          Define the project scope and administrative details for your quote. These inputs will determine the baseline tracking and cost allocation.
-        </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          {/* Project Information Card */}
-          <div className="bg-white dark:bg-card-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6 md:p-8">
-            <div className="flex items-center justify-between mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
-              <div className="flex items-center gap-2">
-                <span className="material-icons-round text-primary text-xl">assignment</span>
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white">Project Information</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Project Information - Main Form */}
+        <div className="lg:col-span-7 flex flex-col gap-6">
+          <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 transition-colors">
+            <div className="flex items-center justify-between mb-8 border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-primary/5 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-blue-400">
+                  <span className="material-icons-round">assignment</span>
+                </div>
+                <h2 className="text-xl font-black text-slate-900 dark:text-white">Project Details</h2>
               </div>
-              <div className="text-right group">
-                <label htmlFor="project-number-input" className="text-[10px] text-gray-400 uppercase font-bold tracking-widest block mb-1 cursor-pointer group-hover:text-primary transition-colors">Project Number</label>
-                <input 
-                  id="project-number-input"
-                  type="text"
-                  spellCheck={false}
-                  className="text-sm font-mono font-black text-primary bg-primary/5 px-2 py-1 rounded border border-primary/10 focus:ring-1 focus:ring-primary focus:border-primary outline-none text-right w-44 hover:bg-primary/10 transition-all"
-                  value={state.projectNumber}
-                  onChange={(e) => onUpdate({ projectNumber: e.target.value })}
-                />
+              <div className="text-right">
+                <label className="text-[10px] text-slate-400 uppercase font-black tracking-widest block mb-1">Project #</label>
+                <div className="text-sm font-mono font-black text-primary bg-primary/5 dark:bg-primary/20 px-3 py-1.5 rounded-lg border border-primary/10">
+                  {state.projectNumber}
+                </div>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="col-span-1">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center justify-between">
-                  Target Annual Volume
-                  <span className="material-icons-round text-gray-400 text-sm cursor-help" title="Expected units per year">info</span>
-                </label>
-                <div className="relative rounded-md shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Target Annual Volume</label>
+                <div className="relative">
                   <input 
-                    className="block w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-primary sm:text-sm py-2.5 px-3" 
+                    className="block w-full h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all px-4 outline-none" 
                     placeholder="50,000" 
                     type="number"
                     value={state.annualVolume}
                     onChange={(e) => onUpdate({ annualVolume: parseInt(e.target.value) || 0 })}
                   />
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500 sm:text-sm">units</span>
+                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                    <span className="text-slate-400 text-xs font-bold uppercase">Units</span>
                   </div>
                 </div>
               </div>
-              <div className="col-span-1">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Region
-                </label>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Production Region</label>
                 <select 
                   value={state.region}
                   onChange={(e) => onUpdate({ region: e.target.value })}
-                  className="block w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-primary sm:text-sm py-2.5 px-3"
+                  className="block w-full h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all px-4 outline-none"
                 >
                   {REGIONS.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                 </select>
               </div>
-            </div>
-
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="col-span-1">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Commodity
-                </label>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Commodity Type</label>
                 <select 
                   value={state.commodity}
                   onChange={(e) => onUpdate({ commodity: e.target.value })}
-                  className="block w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-primary sm:text-sm py-2.5 px-3"
+                  className="block w-full h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all px-4 outline-none"
                 >
-                  <option value="Plastics - Injection">Plastics - Injection</option>
+                  <option value="Plastics - Injection">Plastics - Injection Molding</option>
                   <option value="Plastics - Extrusion">Plastics - Extrusion</option>
-                  <option value="Metal - Stamping">Metal - Stamping</option>
                   <option value="Metal - Die Casting">Metal - Die Casting</option>
                 </select>
               </div>
-              <div className="col-span-1">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Commodity Project Name
-                </label>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Project Internal Name</label>
                 <input 
-                  className="block w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-primary sm:text-sm py-2.5 px-3" 
-                  placeholder="e.g. Enclosure Set V2" 
+                  className="block w-full h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all px-4 outline-none" 
+                  placeholder="e.g. Front Panel Housing" 
                   type="text"
                   value={state.projectName}
                   onChange={(e) => onUpdate({ projectName: e.target.value })}
                 />
               </div>
             </div>
-          </div>
 
-          {/* Ownership & Responsibility Card */}
-          <div className="bg-white dark:bg-card-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6 md:p-8">
-            <div className="flex items-center gap-2 mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
-              <span className="material-icons-round text-primary text-xl">badge</span>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Ownership & Responsibility</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="col-span-1">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Client Name
-                </label>
+            <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Client Organization</label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="material-icons-round text-gray-400 text-sm">business</span>
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                    <span className="material-icons-round text-sm">business</span>
                   </div>
                   <input 
-                    className="block w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-primary sm:text-sm py-2.5 pl-10 pr-3" 
-                    placeholder="Acme Corp" 
+                    className="block w-full h-12 pl-11 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all px-4 outline-none" 
+                    placeholder="Company Name" 
                     type="text"
                     value={state.clientName}
                     onChange={(e) => onUpdate({ clientName: e.target.value })}
                   />
                 </div>
               </div>
-              <div className="col-span-1">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Costing Responsibility
-                </label>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Assigned Expert</label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="material-icons-round text-gray-400 text-sm">person</span>
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                    <span className="material-icons-round text-sm">person</span>
                   </div>
                   <input 
-                    className="block w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-primary sm:text-sm py-2.5 pl-10 pr-3" 
+                    className="block w-full h-12 pl-11 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all px-4 outline-none" 
                     placeholder="Full Name" 
                     type="text"
                     value={state.costingResponsibility}
@@ -161,59 +156,90 @@ const DashboardView: React.FC<Props> = ({ state, onUpdate, onNext, onCancel }) =
           </div>
         </div>
 
-        {/* Sidebar Preview */}
-        <div className="lg:col-span-1">
-          <div className="bg-white dark:bg-card-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6 sticky top-24">
-            <div className="flex items-center gap-2 mb-6">
-              <span className="material-icons-round text-subtext-light dark:text-subtext-dark text-lg">assessment</span>
-              <h3 className="text-sm font-bold text-subtext-light dark:text-subtext-dark uppercase tracking-wider">Estimate Preview</h3>
+        {/* Dialogue Box Section - PROJECT SOURCE */}
+        <div className="lg:col-span-5">
+          <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden sticky top-24 transition-colors">
+            <div className="p-6 bg-slate-900 dark:bg-slate-950 text-white flex items-center justify-between transition-colors">
+              <h3 className="font-black text-sm uppercase tracking-[0.2em] flex items-center gap-2">
+                <span className="material-icons-round text-primary">auto_awesome</span>
+                Source Selection
+              </h3>
+              <div className="size-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_#135bec]"></div>
             </div>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center py-2 border-b border-dashed border-border-light dark:border-border-dark">
-                <span className="text-sm text-subtext-light dark:text-subtext-dark">Tooling Tier</span>
-                <span className="text-sm font-bold text-gray-900 dark:text-white">Class 104</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-dashed border-border-light dark:border-border-dark">
-                <span className="text-sm text-subtext-light dark:text-subtext-dark">Est. Lead Time</span>
-                <span className="text-sm font-bold text-green-600 dark:text-green-400">4-6 Weeks</span>
-              </div>
-              <div className="flex justify-between items-center py-2">
-                <span className="text-sm text-subtext-light dark:text-subtext-dark">Complexity</span>
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1">
-                    <div className="w-6 h-2 rounded-full bg-primary"></div>
-                    <div className="w-6 h-2 rounded-full bg-gray-200 dark:bg-gray-700"></div>
-                    <div className="w-6 h-2 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+            
+            <div className="p-8">
+              {/* CAD Upload Zone */}
+              <div className="mb-8">
+                <div 
+                  className={`group relative h-64 rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center p-6 text-center cursor-pointer ${
+                    dragActive 
+                    ? 'border-primary bg-primary/5' 
+                    : 'border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:bg-slate-50 dark:hover:bg-slate-900/40'
+                  }`}
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  onClick={() => document.getElementById('cad-upload')?.click()}
+                >
+                  <input id="cad-upload" type="file" className="hidden" accept=".stp,.step,.igs,.iges" onChange={(e) => e.target.files && onNext()} />
+                  <div className="size-16 rounded-2xl bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-700 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-300">
+                    <span className="material-symbols-outlined text-primary text-3xl">upload_file</span>
                   </div>
-                  <span className="text-xs text-subtext-light dark:text-subtext-dark">Low</span>
+                  <h4 className="text-lg font-black text-slate-900 dark:text-white mb-2">Upload 3D Model</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-[200px]">
+                    Drop your <strong className="text-slate-900 dark:text-slate-200">STP, STEP, or IGS</strong> files here for instant geometric analysis.
+                  </p>
+                  
+                  <div className="mt-6 flex items-center gap-3">
+                    <div className="flex -space-x-2">
+                      <div className="size-6 rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[8px] font-bold dark:text-slate-300">STP</div>
+                      <div className="size-6 rounded-full bg-slate-100 dark:bg-slate-600 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[8px] font-bold text-primary dark:text-blue-400">IGS</div>
+                    </div>
+                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Industry Standard</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative mb-8 text-center">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-100 dark:border-slate-800"></div>
+                </div>
+                <span className="relative z-10 px-4 bg-white dark:bg-surface-dark text-[10px] font-black text-slate-400 tracking-[0.25em] transition-colors">OR PROCEED MANUALLY</span>
+              </div>
+
+              {/* Manual Entry Section */}
+              <div className="flex flex-col gap-4">
+                <button 
+                  onClick={onNext}
+                  className="w-full h-14 rounded-xl bg-slate-900 dark:bg-white dark:hover:bg-slate-100 hover:bg-black text-white dark:text-slate-900 font-black text-base shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95 group"
+                >
+                  <span className="material-symbols-outlined text-[24px] group-hover:rotate-12 transition-transform">edit_note</span>
+                  Manual Costing
+                </button>
+                <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 flex gap-3 transition-colors">
+                  <span className="material-symbols-outlined text-primary dark:text-blue-400 text-xl">info</span>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+                    Select manual costing if you already have finalized geometric parameters like surface area and volume.
+                  </p>
                 </div>
               </div>
             </div>
-            <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-100 dark:border-blue-800/50 flex gap-3">
-              <span className="material-icons-round text-primary text-xl flex-shrink-0 mt-0.5">lightbulb</span>
-              <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                <span className="font-bold text-slate-800 dark:text-slate-200">Tip:</span> Ensure the "Region" matches your final shipping destination to minimize logistics overhead in the final cost calculation.
+            
+            <div className="px-8 py-5 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center transition-colors">
+              <button 
+                onClick={onCancel}
+                className="text-xs font-black text-slate-400 uppercase tracking-widest hover:text-red-500 transition-colors"
+              >
+                Reset Project
+              </button>
+              <div className="flex items-center gap-1.5">
+                <span className="material-icons-round text-primary dark:text-blue-400 text-sm">verified_user</span>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Secure Neural Link</span>
               </div>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Navigation Footer */}
-      <div className="mt-12 flex justify-end gap-4 border-t border-border-light dark:border-border-dark pt-6 pb-12">
-        <button 
-          onClick={onCancel}
-          className="px-6 py-2.5 rounded-lg border border-border-light dark:border-border-dark text-gray-700 dark:text-gray-300 font-medium text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 dark:focus:ring-gray-700 bg-white dark:bg-card-dark"
-        >
-          Cancel
-        </button>
-        <button 
-          onClick={onNext}
-          className="px-6 py-2.5 rounded-lg bg-primary hover:bg-primary-hover text-white font-medium text-sm transition-colors shadow-sm flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-        >
-          Next: Part Details
-          <span className="material-icons-round text-sm">arrow_forward</span>
-        </button>
       </div>
     </div>
   );

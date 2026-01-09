@@ -1,6 +1,5 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,11 +17,11 @@
                 extend: {
                     colors: {
                         "primary": "#135bec",
-                        "primary-glow": "#135bec80",
+                        "primary-hover": "#0e4ac4",
                         "background-light": "#f8fafc",
-                        "background-dark": "#ffffff",
-                        "surface-dark": "#ffffff",
-                        "surface-border": "#e2e8f0",
+                        "background-dark": "#020617",
+                        "surface-dark": "#0f172a",
+                        "border-dark": "#1e293b",
                         "text-main": "#111827",
                         "text-muted": "#4b5563",
                     },
@@ -39,46 +38,61 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        ::-webkit-scrollbar {
-            width: 8px;
+        
+        html, body, #root {
+            height: 100%;
+            margin: 0;
+            padding: 0;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9; 
+
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+            background-color: #f8fafc;
+            color: #111827;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
+
+        .dark body {
+            background-color: #020617;
+            color: #f8fafc;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
+
         .tech-grid-bg {
             background-size: 40px 40px;
             background-image: linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
                               linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
         }
-        .page-transition {
-            animation: fadeIn 0.4s ease-out;
+        .dark .tech-grid-bg {
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
         }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        .page-transition {
+            animation: fadeIn 0.4s ease-out;
         }
     </style>
     <script type="importmap">
     {
       "imports": {
-        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-        "react/": "https://esm.sh/react@^19.2.3/",
         "react": "https://esm.sh/react@^19.2.3",
-        "recharts": "https://esm.sh/recharts@^3.6.0"
+        "react/": "https://esm.sh/react@^19.2.3/",
+        "react-dom": "https://esm.sh/react-dom@^19.2.3",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+        "recharts": "https://esm.sh/recharts@^3.6.0",
+        "@google/genai": "https://esm.sh/@google/genai@^0.2.1"
       }
     }
     </script>
 </head>
-<body class="bg-white text-text-main font-display antialiased overflow-x-hidden selection:bg-primary selection:text-white">
-    <div id="root"></div>
+<body class="antialiased font-display overflow-x-hidden selection:bg-primary selection:text-white">
+    <div id="root">
+        <div style="display: flex; height: 100%; align-items: center; justify-content: center; font-family: sans-serif; color: #64748b;">
+            <p>Initializing V2Cost Neural Engine...</p>
+        </div>
+    </div>
+    <script type="module" src="index.tsx"></script>
 </body>
 </html>

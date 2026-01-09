@@ -17,7 +17,7 @@ const SummaryView: React.FC<Props> = ({ state, results, onPrev }) => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-4">
-            <h1 className="text-text-main dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-tight">Cost Breakdown & Summary</h1>
+            <h1 className="text-text-main dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-tight">Cost Summary</h1>
             <span className="text-xs font-mono font-bold text-primary bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/20 shadow-sm">{state.projectNumber}</span>
           </div>
           <p className="text-text-sub dark:text-gray-400 text-base font-normal">Detailed financial analysis for {state.projectName} - {state.clientName}</p>
